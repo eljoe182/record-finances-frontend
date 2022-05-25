@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Roboto', sans-serif;
+    /* font-family: 'Roboto Thin', sans-serif; */
+    /* font-family: 'Roboto Light', sans-serif; */
+    /* font-family: 'Roboto Medium', sans-serif; */
+    /* font-family: 'Roboto Black', sans-serif; */
+  }
+}
