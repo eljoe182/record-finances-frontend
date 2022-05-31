@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Input, Label } from "../../components";
+import { signIn } from "../../services/auth.api";
 
 const SignInPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log({
+    await signIn({
       email,
       password,
+    }).then(() => {
+      navigate("/");
     });
-    navigate("/");
   };
 
   return (
