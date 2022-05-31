@@ -7,6 +7,38 @@ class API {
       : import.meta.env.VITE_API_URL_DEV;
   }
 
+  get({ path, headers: extraHeaders = {}, secure = false }) {
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    };
+
+    const headersSecure = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("recFin-token")}`,
+      ...extraHeaders,
+    };
+
+    return fetch(`${this.#server}${path}`, {
+      method: "GET",
+      headers: secure ? headersSecure : headers,
+    })
+      .then((response) => {
+        const { ok } = response;
+        if (ok) {
+          return response.json();
+        }
+        throw response;
+      })
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
+
   post({ path, body = {}, headers: extraHeaders = {}, secure = false }) {
     const headers = {
       Accept: "application/json",
@@ -36,7 +68,7 @@ class API {
       });
   }
 
-  get({ path, headers: extraHeaders = {}, secure = false }) {
+  put({ path, body = {}, headers: extraHeaders = {}, secure = false }) {
     const headers = {
       Accept: "application/json",
       "Content-Type": "application/json",
@@ -50,15 +82,40 @@ class API {
     };
 
     return fetch(`${this.#server}${path}`, {
-      method: "GET",
+      method: "PUT",
+      headers: secure ? headersSecure : headers,
+      body: JSON.stringify(body),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
+
+  delete({ path, headers: extraHeaders = {}, secure = false }) {
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    };
+
+    const headersSecure = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("recFin-token")}`,
+      ...extraHeaders,
+    };
+
+    return fetch(`${this.#server}${path}`, {
+      method: "DELETE",
       headers: secure ? headersSecure : headers,
     })
       .then((response) => {
-        const { ok } = response;
-        if (ok) {
-          return response.json();
-        }
-        throw response;
+        return response.json();
       })
       .then((response) => {
         return response;

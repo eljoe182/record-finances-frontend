@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Input, Label } from "../../components";
+import { destroy, getAll, store, update } from "../../services/wallet.api";
 
 const WalletsPage = () => {
   const [idWallet, setIdWallet] = useState("");
@@ -7,28 +8,54 @@ const WalletsPage = () => {
   const [balance, setBalance] = useState(0);
   const [wallets, setWallets] = useState([]);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const getData = async () => {
+      const response = await getAll();
+      setWallets(response.data);
+    };
+    getData();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setWallets([
-      ...wallets,
-      {
-        id: Math.random().toString(32).substring(2),
+
+    if (idWallet === "") {
+      const response = await store({
         description,
         balance,
-      },
-    ]);
+      });
+      setWallets([...wallets, { ...response.data }]);
+    } else {
+      const response = await update({
+        data: {
+          description,
+          balance,
+        },
+        id: idWallet,
+      });
+      console.log(response);
+      setWallets(
+        wallets.map((wallet) =>
+          wallet._id === idWallet ? response.data : wallet
+        )
+      );
+    }
+
     setIdWallet("");
     setDescription("");
     setBalance(0);
   };
 
   const handleEdit = (wallet) => {
-    const { id, description, balance } = wallet;
-    setIdWallet(id);
+    const { _id, description, balance } = wallet;
+    setIdWallet(_id);
     setDescription(description);
     setBalance(balance);
+  };
 
-    console.log({ id, description, balance });
+  const handleDelete = async (id) => {
+    await destroy(id);
+    setWallets(wallets.filter((wallet) => wallet._id !== id));
   };
 
   return (
@@ -86,10 +113,10 @@ const WalletsPage = () => {
               </p>
             </div>
           )}
-          {wallets.map((wallet) => (
+          {wallets.map((wallet, index) => (
             <div
               className="flex items-center justify-between bg-white px-5 py-5 rounded-xl shadow-lg my-2 hover:bg-gray-100"
-              key={wallet.id}
+              key={index}
             >
               <div className="flex items-center container mx-auto justify-around ">
                 <div className="font-semibold text-green-700">
@@ -105,12 +132,19 @@ const WalletsPage = () => {
                   </span>
                 </div>
               </div>
-              <div>
+              <div className="flex flex-row gap-2">
                 <Button
                   type="button"
                   label="Edit"
                   size="small"
                   onClick={() => handleEdit(wallet)}
+                />
+                <Button
+                  type="button"
+                  label="Delete"
+                  color="danger"
+                  size="small"
+                  onClick={() => handleDelete(wallet._id)}
                 />
               </div>
             </div>
