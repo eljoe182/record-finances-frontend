@@ -5,3 +5,4 @@ export { default as Header } from "./HeaderComponent";
 export { default as Footer } from "./FooterComponent";
 export { default as Sidebar } from "./SidebarComponent";
 export { default as ItemMenu } from "./ItemMenuComponent";
+export { default as Loading } from "./LoadingComponent";
