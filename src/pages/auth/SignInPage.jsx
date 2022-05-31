@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Input, Label } from "../../components";
 import { signIn } from "../../services/auth.api";
+import toast from "react-hot-toast";
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -13,9 +14,13 @@ const SignInPage = () => {
     await signIn({
       email,
       password,
-    }).then(() => {
-      navigate("/");
-    });
+    })
+      .then(() => {
+        navigate("/");
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   return (

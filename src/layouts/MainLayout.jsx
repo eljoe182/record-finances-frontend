@@ -5,6 +5,7 @@ import { useAuth } from "../hooks/useAuth";
 import { getProfile } from "../services/profile.api";
 
 const MainLayout = () => {
+  const navigation = useNavigate();
   const { setAuth, clearAuth } = useAuth();
 
   useEffect(() => {
@@ -14,7 +15,10 @@ const MainLayout = () => {
       });
     };
 
-    getData().catch(() => clearAuth());
+    getData().catch(() => {
+      clearAuth();
+      navigation("/auth/login");
+    });
   }, []);
 
   return (

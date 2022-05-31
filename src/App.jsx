@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainProvider } from "./context/MainProviderContext";
 import AuthLayout from "./layouts/AuthLayout";
@@ -11,6 +12,7 @@ import WalletsPage from "./pages/wallet/WalletsPage";
 function App() {
   return (
     <MainProvider>
+      <Toaster position="top-center" />
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<AuthLayout />}>
