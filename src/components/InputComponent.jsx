@@ -7,6 +7,7 @@ const InputComponent = ({
   placeholder,
   onChange,
   value,
+  props,
 }) => {
   return (
     <input
@@ -17,6 +18,7 @@ const InputComponent = ({
       placeholder={placeholder}
       value={value}
       onChange={onChange}
+      {...props}
     />
   );
 };

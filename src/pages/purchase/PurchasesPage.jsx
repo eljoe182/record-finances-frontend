@@ -1,39 +1,66 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createAutocomplete } from "@algolia/autocomplete-core";
 import { Button, Input, Label } from "../../components";
+import { getAll } from "../../services/wallet.api";
+import { findByDescription } from "../../services/commerce.api";
 
-// const productsData = [
-//   {
-//     productId: 1,
-//     description: "Product 1",
-//     quantity: 1,
-//     price: 100,
-//     discount: 0,
-//     total: 100,
-//   },
-//   {
-//     productId: 2,
-//     description: "Product 2",
-//     quantity: 2,
-//     price: 300,
-//     discount: 0,
-//     total: 600,
-//   },
-// ];
+const AutocompleteItem = ({ _id, description, onClick }) => (
+  <>
+    <li
+      className="hover:bg-neutral-200 flex gap-4 p-2 cursor-pointer"
+      onClick={onClick}
+    >
+      {description}
+    </li>
+  </>
+);
 
 const PurchasesPage = () => {
   const [purchases, setPurchases] = useState([]);
+  const [wallets, setWallets] = useState([]);
+  const [commerceSelected, setCommerceSelected] = useState(null);
   const [items, setItems] = useState([]);
-  const [commerceInfo, setCommerceInfo] = useState(null);
+  const [purchaseInfo, setPurchaseInfo] = useState(null);
   const [productInfo, setProductInfo] = useState(null);
   const [showProductAndList, setShowProductAndList] = useState(false);
+  const [autocompleteState, setAutocompleteState] = useState({
+    collection: [],
+    isOpen: false,
+  });
+
+  const inputRef = useRef(null);
+  const panelRef = useRef(null);
+
+  const autocomplete = useMemo(
+    () =>
+      createAutocomplete({
+        placeholder: "Search a commerce",
+        onStateChange: ({ state }) => setAutocompleteState(state),
+        getSources: () => [
+          {
+            sourceId: "finances-backend",
+            getItems: async ({ query }) => {
+              if (!!query) {
+                return await findByDescription(query);
+              }
+            },
+          },
+        ],
+      }),
+    []
+  );
+
+  const inputProps = autocomplete.getInputProps({
+    inputElement: inputRef.current,
+  });
 
   const handleSaveCommerceInfo = () => {
     setShowProductAndList(true);
   };
 
-  const handleChangeInfoCommerce = (e) => {
+  const handleChangePurchaseInfo = (e) => {
     const { name, value } = e.target;
-    setCommerceInfo({ ...commerceInfo, [name]: value });
+    setPurchaseInfo({ ...purchaseInfo, [name]: value });
   };
 
   const handleChangeInfoProduct = (e) => {
@@ -69,6 +96,23 @@ const PurchasesPage = () => {
     console.log(purchase);
   };
 
+  const handleCommerceSelected = ({ _id, description }) => {
+    setCommerceSelected({
+      _id,
+      description,
+    });
+    autocomplete.setIsOpen(false);
+    autocomplete.setQuery(description);
+  };
+
+  useEffect(() => {
+    const getWallets = async () => {
+      const response = await getAll();
+      setWallets(response.data);
+    };
+    getWallets();
+  }, []);
+
   return (
     <>
       <h1 className="text-3xl font-black">Purchases</h1>
@@ -84,24 +128,73 @@ const PurchasesPage = () => {
           >
             <div className="mb-5">
               <Label text="Commerce" htmlFor="commerce" />
-              <Input
+              {/* <Input
                 id="commerce"
                 name="commerce"
                 type="text"
                 placeholder="Commerce name"
-                onChange={handleChangeInfoCommerce}
+                {...inputProps}
+                onChange={handleChangePurchaseInfo}
+              /> */}
+              <input
+                ref={inputRef}
+                type="text"
+                className="border w-full p-2 mt-2 bg-gray-50 rounded-xl"
+                {...inputProps}
               />
+              <div>
+                {autocompleteState.isOpen && (
+                  <div
+                    className="absolute bg-white rounded-lg shadow-lg p-2 border-2 overflow-hidden"
+                    ref={panelRef}
+                    {...autocomplete.getPanelProps()}
+                  >
+                    {autocompleteState.collections.map((item, index) => {
+                      const { items } = item;
+                      console.log({ items });
+                      return (
+                        <section key={`section-${index}`}>
+                          {items.length > 0 && (
+                            <ul {...autocomplete.getListProps()}>
+                              {items.map((item) => (
+                                <AutocompleteItem
+                                  key={item._id}
+                                  {...item}
+                                  onClick={() => handleCommerceSelected(item)}
+                                />
+                              ))}
+                            </ul>
+                          )}
+                        </section>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="my-5 grid grid-cols-2 gap-5">
               <div>
                 <Label text="Wallet" htmlFor="wallet" />
-                <Input
+                <select
+                  id="wallet"
+                  name="wallet"
+                  className="border w-full p-2 mt-2 bg-gray-50 rounded-xl"
+                  onChange={handleChangePurchaseInfo}
+                >
+                  <option value="">-- Select wallet --</option>
+                  {wallets.map((wallet) => (
+                    <option key={wallet._id} value={wallet._id}>
+                      {wallet.description}
+                    </option>
+                  ))}
+                </select>
+                {/* <Input
                   id="wallet"
                   name="wallet"
                   type="text"
                   placeholder="What wallet have used?"
-                  onChange={handleChangeInfoCommerce}
-                />
+                  onChange={handleChangePurchaseInfo}
+                /> */}
               </div>
               <div>
                 <Label text="Date invoice" htmlFor="dateInvoice" />
@@ -109,7 +202,7 @@ const PurchasesPage = () => {
                   id="dateInvoice"
                   name="dateInvoice"
                   type="date"
-                  onChange={handleChangeInfoCommerce}
+                  onChange={handleChangePurchaseInfo}
                 />
               </div>
             </div>
@@ -120,7 +213,8 @@ const PurchasesPage = () => {
                 name="description"
                 type="text"
                 placeholder="Purchase of products on the market"
-                onChange={handleChangeInfoCommerce}
+                value={purchaseInfo?.description ?? ""}
+                onChange={handleChangePurchaseInfo}
               />
             </div>
             <div className="mt-10">
@@ -193,25 +287,25 @@ const PurchasesPage = () => {
                 <div className="text-sm uppercase text-green-600">
                   Commerce:{" "}
                   <span className="text-sm text-black normal-case">
-                    {commerceInfo?.commerce}
+                    {purchaseInfo?.commerce}
                   </span>
                 </div>
                 <div className="text-sm uppercase text-green-600">
                   Date Invoice:{" "}
                   <span className="text-sm text-black normal-case">
-                    {commerceInfo?.dateInvoice}
+                    {purchaseInfo?.dateInvoice}
                   </span>
                 </div>
                 <div className="text-sm uppercase text-green-600">
                   Wallet pay:{" "}
                   <span className="text-sm text-black normal-case">
-                    {commerceInfo?.wallet}
+                    {purchaseInfo?.wallet}
                   </span>
                 </div>
                 <div className="text-sm uppercase text-green-600">
                   Description:{" "}
                   <span className="text-sm text-black normal-case">
-                    {commerceInfo?.description}
+                    {purchaseInfo?.description}
                   </span>
                 </div>
               </div>
