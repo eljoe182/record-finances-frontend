@@ -1,19 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { createAutocomplete } from "@algolia/autocomplete-core";
+
 import { Button, Input, Label } from "../../components";
 import { getAll } from "../../services/wallet.api";
-import { findByDescription } from "../../services/commerce.api";
-
-const AutocompleteItem = ({ _id, description, onClick }) => (
-  <>
-    <li
-      className="hover:bg-neutral-200 flex gap-4 p-2 cursor-pointer"
-      onClick={onClick}
-    >
-      {description}
-    </li>
-  </>
-);
+import { findByDescription, store } from "../../services/commerce.api";
+import AutocompleteComponent from "../../components/AutocompleteComponent";
 
 const PurchasesPage = () => {
   const [purchases, setPurchases] = useState([]);
@@ -23,36 +13,6 @@ const PurchasesPage = () => {
   const [purchaseInfo, setPurchaseInfo] = useState(null);
   const [productInfo, setProductInfo] = useState(null);
   const [showProductAndList, setShowProductAndList] = useState(false);
-  const [autocompleteState, setAutocompleteState] = useState({
-    collection: [],
-    isOpen: false,
-  });
-
-  const inputRef = useRef(null);
-  const panelRef = useRef(null);
-
-  const autocomplete = useMemo(
-    () =>
-      createAutocomplete({
-        placeholder: "Search a commerce",
-        onStateChange: ({ state }) => setAutocompleteState(state),
-        getSources: () => [
-          {
-            sourceId: "finances-backend",
-            getItems: async ({ query }) => {
-              if (!!query) {
-                return await findByDescription(query);
-              }
-            },
-          },
-        ],
-      }),
-    []
-  );
-
-  const inputProps = autocomplete.getInputProps({
-    inputElement: inputRef.current,
-  });
 
   const handleSaveCommerceInfo = () => {
     setShowProductAndList(true);
@@ -66,6 +26,20 @@ const PurchasesPage = () => {
   const handleChangeInfoProduct = (e) => {
     const { name, value } = e.target;
     setProductInfo({ ...productInfo, [name]: value });
+  };
+
+  const handOnSelected = (commerce) => {
+    console.log({ commerce });
+    // setProductInfo({
+    //   ...productInfo,
+    //   commerceId: _id,
+    //   commerceDescription: description,
+    // });
+  };
+
+  const handleAutoSave = async (commerce) => {
+    // const response = await store(commerce);
+    // console.log({ response });
   };
 
   const handleAddProduct = () => {
@@ -96,15 +70,6 @@ const PurchasesPage = () => {
     console.log(purchase);
   };
 
-  const handleCommerceSelected = ({ _id, description }) => {
-    setCommerceSelected({
-      _id,
-      description,
-    });
-    autocomplete.setIsOpen(false);
-    autocomplete.setQuery(description);
-  };
-
   useEffect(() => {
     const getWallets = async () => {
       const response = await getAll();
@@ -126,52 +91,14 @@ const PurchasesPage = () => {
               showProductAndList ? "hidden" : ""
             }`}
           >
-            <div className="mb-5">
-              <Label text="Commerce" htmlFor="commerce" />
-              {/* <Input
-                id="commerce"
-                name="commerce"
-                type="text"
-                placeholder="Commerce name"
-                {...inputProps}
-                onChange={handleChangePurchaseInfo}
-              /> */}
-              <input
-                ref={inputRef}
-                type="text"
-                className="border w-full p-2 mt-2 bg-gray-50 rounded-xl"
-                {...inputProps}
-              />
-              <div>
-                {autocompleteState.isOpen && (
-                  <div
-                    className="absolute bg-white rounded-lg shadow-lg p-2 border-2 overflow-hidden"
-                    ref={panelRef}
-                    {...autocomplete.getPanelProps()}
-                  >
-                    {autocompleteState.collections.map((item, index) => {
-                      const { items } = item;
-                      console.log({ items });
-                      return (
-                        <section key={`section-${index}`}>
-                          {items.length > 0 && (
-                            <ul {...autocomplete.getListProps()}>
-                              {items.map((item) => (
-                                <AutocompleteItem
-                                  key={item._id}
-                                  {...item}
-                                  onClick={() => handleCommerceSelected(item)}
-                                />
-                              ))}
-                            </ul>
-                          )}
-                        </section>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
+            <AutocompleteComponent
+              title="Commerce"
+              placeholder="Find commerce"
+              sourceId="finances-backend"
+              source={findByDescription}
+              onSelected={handOnSelected}
+              onAutoSave={handleAutoSave}
+            />
             <div className="my-5 grid grid-cols-2 gap-5">
               <div>
                 <Label text="Wallet" htmlFor="wallet" />
@@ -188,13 +115,6 @@ const PurchasesPage = () => {
                     </option>
                   ))}
                 </select>
-                {/* <Input
-                  id="wallet"
-                  name="wallet"
-                  type="text"
-                  placeholder="What wallet have used?"
-                  onChange={handleChangePurchaseInfo}
-                /> */}
               </div>
               <div>
                 <Label text="Date invoice" htmlFor="dateInvoice" />
