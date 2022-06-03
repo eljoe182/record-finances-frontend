@@ -6,7 +6,6 @@ const InputComponent = ({
   type = "text",
   placeholder,
   onChange,
-  value,
   props,
 }) => {
   return (
@@ -16,7 +15,6 @@ const InputComponent = ({
       name={name}
       className="border w-full p-2 mt-2 bg-gray-50 rounded-xl"
       placeholder={placeholder}
-      value={value}
       onChange={onChange}
       {...props}
     />

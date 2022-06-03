@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { createAutocomplete } from "@algolia/autocomplete-core";
 import { Label } from ".";
-import { findByDescription } from "../services/commerce.api";
 
 const AutocompleteItem = ({ _id, description, onClick }) => (
   <>
@@ -14,20 +13,12 @@ const AutocompleteItem = ({ _id, description, onClick }) => (
   </>
 );
 
-const AutocompleteComponent = ({
-  placeholder,
-  title,
-  sourceId,
-  source,
-  onSelected,
-  onAutoSave,
-}) => {
+const AutocompleteComponent = ({ placeholder, title, sources, onSelected }) => {
   const [autocompleteState, setAutocompleteState] = useState({
     collections: [],
     isOpen: false,
     query: "",
   });
-  const [inputValue, setInputValue] = useState({});
 
   const inputRef = useRef(null);
   const panelRef = useRef(null);
@@ -37,16 +28,19 @@ const AutocompleteComponent = ({
       createAutocomplete({
         placeholder,
         onStateChange: ({ state }) => setAutocompleteState(state),
-        getSources: () => [
-          {
-            sourceId,
-            getItems: async ({ query }) => {
-              if (!!query) {
-                return await source(query);
-              }
-            },
-          },
-        ],
+        onReset: () =>
+          setAutocompleteState({ ...autocompleteState, query: "" }),
+        getSources: () =>
+          sources.map((source) => {
+            return {
+              sourceId: source.id,
+              getItems: async ({ query }) => {
+                if (!!query) {
+                  return await source.fnSource(query);
+                }
+              },
+            };
+          }),
       }),
     []
   );
@@ -56,7 +50,6 @@ const AutocompleteComponent = ({
   });
 
   const handleSelected = ({ _id, description }) => {
-    setInputValue({ _id, description });
     autocomplete.setIsOpen(false);
     autocomplete.setQuery(description);
   };
@@ -65,21 +58,25 @@ const AutocompleteComponent = ({
     autocomplete.setIsOpen(false);
 
     if (autocompleteState.query === "") {
-      setInputValue({});
       onSelected(null);
       return;
     }
 
     const collections = autocompleteState.collections[0].items.find(
-      (item) => item.description === autocompleteState.query
+      (item) =>
+        `${item.description}`.toLowerCase() ===
+        `${autocompleteState.query}`.toLowerCase()
     );
 
     if (collections) {
-      onSelected(inputValue);
+      onSelected(collections);
       return;
     }
 
-    onAutoSave(autocompleteState.query);
+    onSelected({
+      _id: `new-${Math.ceil(Math.random() * 100000)}`,
+      description: `${autocompleteState.query}`.toUpperCase(),
+    });
   };
 
   return (

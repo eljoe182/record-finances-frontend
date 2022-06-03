@@ -1,74 +1,138 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
-import { Button, Input, Label } from "../../components";
-import { getAll } from "../../services/wallet.api";
-import { findByDescription, store } from "../../services/commerce.api";
 import AutocompleteComponent from "../../components/AutocompleteComponent";
+import { Button, Input, Label } from "../../components";
+
+import { getAll } from "../../services/wallet.api";
+import { findByDescription } from "../../services/commerce.api";
+import { findByDescription as productFindByDescription } from "../../services/products.api";
+import { store } from "../../services/purchase.api";
+import { currency } from "../../helpers/numberFormat";
 
 const PurchasesPage = () => {
-  const [purchases, setPurchases] = useState([]);
+  const navigate = useNavigate();
   const [wallets, setWallets] = useState([]);
-  const [commerceSelected, setCommerceSelected] = useState(null);
   const [items, setItems] = useState([]);
   const [purchaseInfo, setPurchaseInfo] = useState(null);
   const [productInfo, setProductInfo] = useState(null);
   const [showProductAndList, setShowProductAndList] = useState(false);
 
+  const [quantity, setQuantity] = useState(0);
+  const [price, setPrice] = useState(0);
+  const [discount, setDiscount] = useState(0);
+
+  const [subTotal, setSubTotal] = useState(0);
+  const [discountTotal, setDiscountTotal] = useState(0);
+  const [net, setNet] = useState(0);
+  const [tax, setTax] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  const walletRef = useRef(null);
+  const formProductRef = useRef(null);
+
+  /** COMMERCE INFO */
+  const handleChangePurchaseInfo = (e) => {
+    const { name, value, options, selectedIndex, type } = e.target;
+
+    if (type === "select-one") {
+      setPurchaseInfo({
+        ...purchaseInfo,
+        walletId: options[selectedIndex].value,
+        walletDescription: options[selectedIndex].text,
+      });
+      return;
+    }
+    setPurchaseInfo({ ...purchaseInfo, [name]: value });
+  };
+
+  const handleCommerceOnSelected = (commerce) => {
+    setPurchaseInfo({
+      ...purchaseInfo,
+      commerceId: commerce?._id ?? null,
+      commerceDescription: commerce?.description ?? null,
+    });
+  };
+
   const handleSaveCommerceInfo = () => {
     setShowProductAndList(true);
   };
 
-  const handleChangePurchaseInfo = (e) => {
-    const { name, value } = e.target;
-    setPurchaseInfo({ ...purchaseInfo, [name]: value });
+  /** PRODUCT INFO */
+
+  const handleProductOnSelected = (product) => {
+    setProductInfo({
+      productId: product?._id ?? null,
+      productDescription: product?.description ?? null,
+    });
   };
 
-  const handleChangeInfoProduct = (e) => {
-    const { name, value } = e.target;
-    setProductInfo({ ...productInfo, [name]: value });
-  };
-
-  const handOnSelected = (commerce) => {
-    console.log({ commerce });
-    // setProductInfo({
-    //   ...productInfo,
-    //   commerceId: _id,
-    //   commerceDescription: description,
-    // });
-  };
-
-  const handleAutoSave = async (commerce) => {
-    // const response = await store(commerce);
-    // console.log({ response });
-  };
-
-  const handleAddProduct = () => {
-    const { productId, product, description, quantity, price, discount } =
-      productInfo;
+  const handleAddProduct = (e) => {
+    e.preventDefault();
     const newItem = {
-      productId: Math.random() * 100,
-      description: product,
+      productId: productInfo?.productId,
+      description: productInfo.productDescription,
       quantity,
       price,
       discount,
       total: quantity * price,
     };
+    console.log({ newItem });
     setItems([...items, newItem]);
+    calculateTotal();
     setProductInfo(null);
+    formProductRef.current.reset();
   };
 
   const handleRemoveProduct = (productId) => {
     setItems(items.filter((item) => item.productId !== productId));
   };
 
-  const handleSavePurchase = () => {
-    console.log("save purchase");
+  /** ORDER */
+
+  const calculateTotal = () => {
+    let calcSubTotal = 0;
+    let calcDiscount = 0;
+    items.map((item) => {
+      calcSubTotal += item.total;
+      calcDiscount += item.discount;
+    });
+
+    const calcNet = calcSubTotal - calcDiscount;
+    const calcTax = Math.ceil(calcNet * 0.19);
+    const calcTotal = calcNet + calcTax;
+
+    setSubTotal(calcSubTotal);
+    setDiscountTotal(calcDiscount);
+    setNet(calcNet);
+    setTax(calcTax);
+    setTotal(calcTotal);
+  };
+
+  const handleSavePurchase = async () => {
     const purchase = {
-      ...commerceInfo,
+      ...purchaseInfo,
+      subTotal,
+      discountTotal,
+      net,
+      tax,
+      total,
       items,
     };
-    console.log(purchase);
+    await store(purchase)
+      .then((res) => {
+        const { _id } = res.data;
+        navigate(`/purchases/show/${_id}`);
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message);
+      });
   };
+
+  useEffect(() => {
+    calculateTotal();
+  }, [items]);
 
   useEffect(() => {
     const getWallets = async () => {
@@ -94,17 +158,21 @@ const PurchasesPage = () => {
             <AutocompleteComponent
               title="Commerce"
               placeholder="Find commerce"
-              sourceId="finances-backend"
-              source={findByDescription}
-              onSelected={handOnSelected}
-              onAutoSave={handleAutoSave}
+              sources={[
+                {
+                  id: "finances-backend",
+                  fnSource: findByDescription,
+                },
+              ]}
+              onSelected={handleCommerceOnSelected}
             />
             <div className="my-5 grid grid-cols-2 gap-5">
               <div>
-                <Label text="Wallet" htmlFor="wallet" />
+                <Label text="Wallet" htmlFor="walletId" />
                 <select
-                  id="wallet"
-                  name="wallet"
+                  ref={walletRef}
+                  id="walletId"
+                  name="walletId"
                   className="border w-full p-2 mt-2 bg-gray-50 rounded-xl"
                   onChange={handleChangePurchaseInfo}
                 >
@@ -149,16 +217,22 @@ const PurchasesPage = () => {
             className={showProductAndList ? "grid grid-cols-2 gap-5" : "hidden"}
           >
             <div className="">
-              <div className="bg-white px-5 py-10 rounded-xl shadow-md mt-2">
+              <form
+                ref={formProductRef}
+                className="bg-white px-5 py-10 rounded-xl shadow-md mt-2"
+                onSubmit={handleAddProduct}
+              >
                 <div className="mb-5">
-                  <Label text="Product" htmlFor="product" />
-                  <Input
-                    id="product"
-                    name="product"
-                    type="text"
-                    placeholder="Product name"
-                    value={productInfo?.product ?? ""}
-                    onChange={handleChangeInfoProduct}
+                  <AutocompleteComponent
+                    title="Product"
+                    placeholder="Find product"
+                    sources={[
+                      {
+                        id: "finances-backend",
+                        fnSource: productFindByDescription,
+                      },
+                    ]}
+                    onSelected={handleProductOnSelected}
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-5">
@@ -168,8 +242,7 @@ const PurchasesPage = () => {
                       id="quantity"
                       name="quantity"
                       type="number"
-                      value={productInfo?.quantity ?? ""}
-                      onChange={handleChangeInfoProduct}
+                      onChange={(e) => setQuantity(Number(e.target.value))}
                     />
                   </div>
                   <div className="my-5">
@@ -178,8 +251,7 @@ const PurchasesPage = () => {
                       id="price"
                       name="price"
                       type="number"
-                      value={productInfo?.price ?? ""}
-                      onChange={handleChangeInfoProduct}
+                      onChange={(e) => setPrice(Number(e.target.value))}
                     />
                   </div>
                   <div className="my-5">
@@ -188,26 +260,21 @@ const PurchasesPage = () => {
                       id="discount"
                       name="discount"
                       type="number"
-                      value={productInfo?.discount ?? ""}
-                      onChange={handleChangeInfoProduct}
+                      onChange={(e) => setDiscount(Number(e.target.value))}
                     />
                   </div>
                 </div>
                 <div className="my-5">
-                  <Button
-                    type="button"
-                    label="Add Product"
-                    onClick={handleAddProduct}
-                  />
+                  <Button type="submit" label="Add Product" />
                 </div>
-              </div>
+              </form>
             </div>
             <div>
               <div className="grid grid-cols-2">
                 <div className="text-sm uppercase text-green-600">
                   Commerce:{" "}
                   <span className="text-sm text-black normal-case">
-                    {purchaseInfo?.commerce}
+                    {purchaseInfo?.commerceDescription}
                   </span>
                 </div>
                 <div className="text-sm uppercase text-green-600">
@@ -219,7 +286,7 @@ const PurchasesPage = () => {
                 <div className="text-sm uppercase text-green-600">
                   Wallet pay:{" "}
                   <span className="text-sm text-black normal-case">
-                    {purchaseInfo?.wallet}
+                    {purchaseInfo?.walletDescription}
                   </span>
                 </div>
                 <div className="text-sm uppercase text-green-600">
@@ -245,17 +312,18 @@ const PurchasesPage = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white">
-                  {items.map((item) => (
-                    <tr
-                      key={item.productId}
-                      className="border-t-2 hover:bg-neutral-100"
-                    >
+                  {items.map((item, index) => (
+                    <tr key={index} className="border-t-2 hover:bg-neutral-100">
                       <td className="px-4 py-2 text-justify">
                         {item.description}
                       </td>
                       <td className="px-4 py-2 text-center">{item.quantity}</td>
-                      <td className="px-4 py-2 text-right">{item.price}</td>
-                      <td className="px-4 py-2 text-right">{item.discount}</td>
+                      <td className="px-4 py-2 text-right">
+                        {currency(item.price)}
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        {currency(item.discount)}
+                      </td>
                       <td className="px-4 py-2 text-right">
                         <Button
                           type="button"
@@ -273,12 +341,37 @@ const PurchasesPage = () => {
                       Total
                     </td>
                     <td className="px-4 py-2 text-right">
-                      {items.reduce((acc, item) => acc + item.total, 0)}
+                      {currency(subTotal)}
                     </td>
-                    <td className="px-4 py-2 text-right">0</td>
+                    <td className="px-4 py-2 text-right">
+                      {currency(discountTotal)}
+                    </td>
                   </tr>
                 </tfoot>
               </table>
+              <div className="mt-5 grid grid-cols-2">
+                <div className="col-start-2 col-end-2">
+                  <div className="font-bold text-sm uppercase flex justify-between">
+                    <span>Sub Total:</span>
+                    <span>{currency(subTotal)}</span>
+                  </div>
+                  <div className="font-bold text-sm uppercase flex justify-between">
+                    <span>Discount:</span>
+                    <span>{currency(discountTotal)}</span>
+                  </div>
+                  <div className="font-bold text-sm uppercase flex justify-between">
+                    <span>Net:</span> <span>{currency(net)}</span>
+                  </div>
+                  <div className="font-bold text-sm uppercase flex justify-between">
+                    <span>Tax (19%):</span>
+                    <span>{currency(tax)}</span>
+                  </div>
+                  <h4 className="font-bold text-sm uppercase flex justify-between text-green-600">
+                    <span>Total:</span>
+                    <span>{currency(total)}</span>
+                  </h4>
+                </div>
+              </div>
               <div className="mt-10">
                 <Button
                   type="button"

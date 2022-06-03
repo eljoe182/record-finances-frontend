@@ -7,6 +7,7 @@ import SignInPage from "./pages/auth/SignInPage";
 import SignUpPage from "./pages/auth/SignUpPage";
 import DashboardPage from "./pages/DashboardPage";
 import PurchasesPage from "./pages/purchase/PurchasesPage";
+import ShowPurchasePage from "./pages/purchase/ShowPurchasePage";
 import WalletsPage from "./pages/wallet/WalletsPage";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
             <Route index element={<DashboardPage />} />
             <Route path="wallets" element={<WalletsPage />} />
             <Route path="purchases" element={<PurchasesPage />} />
+            <Route path="purchases/show/:id" element={<ShowPurchasePage />} />
           </Route>
         </Routes>
       </BrowserRouter>
