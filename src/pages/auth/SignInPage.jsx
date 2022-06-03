@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button, Input, Label } from "../../components";
 import { signIn } from "../../services/auth.api";
 import toast from "react-hot-toast";
+import { envelop, key } from "../../helpers/icons";
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const SignInPage = () => {
           <div className="my-5">
             <Label text="Email" htmlFor="email" />
             <Input
+              icon={envelop}
               id="email"
               type="email"
               placeholder="Enter your email"
@@ -42,6 +44,7 @@ const SignInPage = () => {
           <div className="my-5">
             <Label text="Password" htmlFor="password" />
             <Input
+              icon={key}
               id="password"
               type="password"
               placeholder="Enter your password"
@@ -49,7 +52,12 @@ const SignInPage = () => {
             />
           </div>
           <div className="mt-10">
-            <Button type="submit" label="Sign in" color="primary" />
+            <Button
+              type="submit"
+              label="Sign in"
+              color="primary"
+              block={true}
+            />
           </div>
           <nav className="mt-5 lg:flex lg:justify-between">
             <Link

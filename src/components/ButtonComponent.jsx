@@ -1,6 +1,13 @@
 import React from "react";
 
-const ButtonComponent = ({ label, type, onClick, color, size }) => {
+const ButtonComponent = ({
+  label,
+  type,
+  onClick,
+  color,
+  size,
+  block = false,
+}) => {
   const getColor = (value) => {
     switch (value) {
       case "secondary":
@@ -20,23 +27,25 @@ const ButtonComponent = ({ label, type, onClick, color, size }) => {
 
   const getSize = (value) => {
     switch (value) {
-      case "small":
-        return "py-1 px-5 rounded-md text-xs";
-      case "medium":
-        return "text-base";
-      case "large":
-        return "text-lg";
+      case "xs":
+        return "py-0 px-1 rounded-md text-[10px]";
+      case "sm":
+        return "py-1 px-5 rounded-md text-sm";
+      case "md":
+        return "py-2 px-10 rounded-xl text-base";
+      case "lg":
+        return "py-4 px-20 rounded-2xl text-lg";
       default:
-        return "py-2 px-10 rounded-xl";
+        return "py-2 px-10 rounded-xl text-base";
     }
   };
 
   return (
     <button
       type={type}
-      className={`${getColor(color)} w-full ${getSize(
+      className={`${getColor(color)} ${block ? "w-full" : ""} ${getSize(
         size
-      )} uppercase transition-colors`}
+      )} h-fit uppercase transition-colors`}
       onClick={onClick}
     >
       {label}

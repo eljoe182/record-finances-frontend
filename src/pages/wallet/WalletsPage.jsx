@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, createRef } from "react";
 import { Button, Input, Label, Loading } from "../../components";
+import { edit, trash } from "../../helpers/icons";
 import { destroy, getAll, store, update } from "../../services/wallet.api";
 
 const WalletsPage = () => {
@@ -125,6 +126,7 @@ const WalletsPage = () => {
                     type="submit"
                     label={idWallet !== "" ? "Edit" : "Add"}
                     color={idWallet !== "" ? "secondary" : "primary"}
+                    block={true}
                   />
                 </div>
               </>
@@ -157,7 +159,7 @@ const WalletsPage = () => {
                     <Loading show={true} />
                   </div>
                   <div ref={(el) => (rowListWalletRef.current[index] = el)}>
-                    <div className="grid grid-cols-3 bg-white p-3 rounded-xl shadow-lg my-2 hover:bg-gray-100">
+                    <div className="grid grid-cols-3 bg-white p-3 rounded-xl shadow-lg my-2 hover:bg-gray-100 items-center">
                       <div className="font-semibold text-green-700">
                         Wallet:{" "}
                         <span className="font-normal text-black">
@@ -173,15 +175,15 @@ const WalletsPage = () => {
                       <div className="flex flex-row gap-2">
                         <Button
                           type="button"
-                          label="Edit"
-                          size="small"
+                          label={edit}
+                          size="sm"
                           onClick={() => handleEdit(wallet)}
                         />
                         <Button
                           type="button"
-                          label="Delete"
+                          label={trash}
                           color="danger"
-                          size="small"
+                          size="sm"
                           onClick={async () => {
                             buttonDeleteRef.current[index].className = "";
                             rowListWalletRef.current[index].className =

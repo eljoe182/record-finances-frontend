@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button } from "../../components";
 import { currency } from "../../helpers/numberFormat";
 import { show } from "../../services/purchase.api";
 
 const ShowPurchasePage = () => {
+  const navigate = useNavigate();
   const params = useParams();
   const [purchaseInfo, setPurchaseInfo] = useState({});
 
@@ -16,13 +18,21 @@ const ShowPurchasePage = () => {
     getData();
   }, []);
 
+  const handleNewPurchase = () => {
+    navigate("/purchases/new");
+  };
+
+  const handleShowPurchases = () => {
+    navigate("/purchases/list");
+  };
+
   return (
-    <div className="mt-5 flex items-center justify-center ">
+    <div className="mt-5 flex flex-col items-center justify-center ">
       <div className="bg-white p-5 rounded-xl shadow-md mt-2 w-96">
         <h1 className="text-center font-bold text-2xl">
           {purchaseInfo?.commerceId?.description}
         </h1>
-        <p className="my-5 gap-2">
+        <div className="my-5 gap-2">
           <div className="flex flex-row justify-between">
             <div className="flex flex-col items-start text-sm">
               <span>Payment:</span>
@@ -40,7 +50,7 @@ const ShowPurchasePage = () => {
           <div className="mt-2 text-justify px-5">
             {purchaseInfo.description}
           </div>
-        </p>
+        </div>
 
         <div className="border-b-2 pb-2">
           <div className="grid grid-cols-5 text-xs font-bold mb-2 border-t-2 py-2 border-b-2 uppercase">
@@ -107,6 +117,10 @@ const ShowPurchasePage = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="grid grid-cols-2 my-5 gap-5">
+        <Button label="Create new" onClick={handleNewPurchase} />
+        <Button label="Show all" onClick={handleShowPurchases} />
       </div>
     </div>
   );

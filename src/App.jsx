@@ -6,6 +6,7 @@ import MainLayout from "./layouts/MainLayout";
 import SignInPage from "./pages/auth/SignInPage";
 import SignUpPage from "./pages/auth/SignUpPage";
 import DashboardPage from "./pages/DashboardPage";
+import NewPurchasePage from "./pages/purchase/NewPurchasePage";
 import PurchasesPage from "./pages/purchase/PurchasesPage";
 import ShowPurchasePage from "./pages/purchase/ShowPurchasePage";
 import WalletsPage from "./pages/wallet/WalletsPage";
@@ -24,6 +25,7 @@ function App() {
             <Route index element={<DashboardPage />} />
             <Route path="wallets" element={<WalletsPage />} />
             <Route path="purchases" element={<PurchasesPage />} />
+            <Route path="purchases/new" element={<NewPurchasePage />} />
             <Route path="purchases/show/:id" element={<ShowPurchasePage />} />
           </Route>
         </Routes>
