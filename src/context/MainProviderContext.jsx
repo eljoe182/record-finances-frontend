@@ -1,9 +1,10 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useState } from "react";
 
 export const MainContext = createContext();
 
 export const MainProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
+  const [openMenu, setOpenMenu] = useState(false);
 
   const clearAuth = () => {
     setAuth(null);
@@ -11,7 +12,9 @@ export const MainProvider = ({ children }) => {
   };
 
   return (
-    <MainContext.Provider value={{ auth, setAuth, clearAuth }}>
+    <MainContext.Provider
+      value={{ auth, setAuth, clearAuth, openMenu, setOpenMenu }}
+    >
       {children}
     </MainContext.Provider>
   );

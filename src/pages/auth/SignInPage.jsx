@@ -29,7 +29,7 @@ const SignInPage = () => {
       <h1 className="text-3xl font-black text-center ">
         Record<span className="text-green-600">Finance</span>
       </h1>
-      <div className="bg-white border-1 shadow-md px-5 py-10 rounded-lg mt-20">
+      <div className="bg-white border-1 shadow-md px-5 py-10 rounded-lg mt-20 xs:mt-5">
         <form onSubmit={handleSubmit}>
           <div className="my-5">
             <Label text="Email" htmlFor="email" />

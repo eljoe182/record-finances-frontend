@@ -25,10 +25,10 @@ const MainLayout = () => {
     <>
       <div className="flex flex-col min-h-screen">
         <Header />
-        <div className="flex flex-1">
+        <div className="flex flex-1 static">
           <Sidebar />
-          <div className="flex flex-col flex-1">
-            <main className="flex-1 px-4 pt-4 mb-10">
+          <div className="flex flex-col flex-1 static">
+            <main className="flex-1 px-4 pt-4 mb-10 static">
               <Outlet />
             </main>
             <Footer />

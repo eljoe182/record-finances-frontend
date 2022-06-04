@@ -151,49 +151,58 @@ const WalletsPage = () => {
                 </div>
               )}
               {wallets.map((wallet, index) => (
-                <div key={index}>
+                <div
+                  key={index}
+                  className="bg-white py-3 px-5 rounded-xl shadow-lg my-2 hover:bg-gray-100 md:mx-20 lg:mx-auto"
+                >
                   <div
                     className="hidden"
                     ref={(el) => (buttonDeleteRef.current[index] = el)}
                   >
                     <Loading show={true} />
                   </div>
-                  <div ref={(el) => (rowListWalletRef.current[index] = el)}>
-                    <div className="grid grid-cols-3 bg-white p-3 rounded-xl shadow-lg my-2 hover:bg-gray-100 items-center">
-                      <div className="font-semibold text-green-700">
-                        Wallet:{" "}
+                  <div
+                    ref={(el) => (rowListWalletRef.current[index] = el)}
+                    className="flex flex-row justify-between items-center"
+                  >
+                    <div className="">
+                      <div className="flex gap-2">
+                        <span className="font-semibold text-green-700">
+                          Wallet:
+                        </span>
                         <span className="font-normal text-black">
                           {wallet.description}
                         </span>
                       </div>
-                      <div className="font-semibold text-green-700">
-                        Balance:{" "}
+                      <div className="flex gap-2">
+                        <span className="font-semibold text-green-700">
+                          Balance:
+                        </span>
                         <span className="font-normal text-black">
                           {wallet.balance}
                         </span>
                       </div>
-                      <div className="flex flex-row gap-2">
-                        <Button
-                          type="button"
-                          label={edit}
-                          size="sm"
-                          onClick={() => handleEdit(wallet)}
-                        />
-                        <Button
-                          type="button"
-                          label={trash}
-                          color="danger"
-                          size="sm"
-                          onClick={async () => {
-                            buttonDeleteRef.current[index].className = "";
-                            rowListWalletRef.current[index].className =
-                              "hidden";
-                            await handleDelete(wallet._id);
-                            buttonDeleteRef.current[index].className = "hidden";
-                            rowListWalletRef.current[index].className = "";
-                          }}
-                        />
-                      </div>
+                    </div>
+                    <div className="flex flex-row gap-2">
+                      <Button
+                        type="button"
+                        label={edit}
+                        size="sm"
+                        onClick={() => handleEdit(wallet)}
+                      />
+                      <Button
+                        type="button"
+                        label={trash}
+                        color="danger"
+                        size="sm"
+                        onClick={async () => {
+                          buttonDeleteRef.current[index].className = "";
+                          rowListWalletRef.current[index].className = "hidden";
+                          await handleDelete(wallet._id);
+                          buttonDeleteRef.current[index].className = "hidden";
+                          rowListWalletRef.current[index].className = "";
+                        }}
+                      />
                     </div>
                   </div>
                 </div>

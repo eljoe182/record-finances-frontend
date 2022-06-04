@@ -176,3 +176,17 @@ export const remove = (
     <line stroke="currentColor" x1="17" y1="12" x2="7" y2="12" />
   </svg>
 );
+
+export const menu = (
+  <svg
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+  >
+    <line stroke="currentColor" x1="4" y1="12" x2="20" y2="12" />
+    <line stroke="currentColor" x1="4" y1="5" x2="20" y2="5" />
+    <line stroke="currentColor" x1="4" y1="19" x2="20" y2="19" />
+  </svg>
+);

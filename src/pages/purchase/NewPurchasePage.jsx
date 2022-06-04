@@ -175,7 +175,7 @@ const NewPurchasePage = () => {
       <p className="text-green-600 font-thin text-sm opacity-70">
         Register your purchases here.
       </p>
-      <div className="container mx-auto">
+      <div className="mx-auto">
         <div className="mt-5 flex flex-row justify-center ">
           <form
             className={`bg-white px-5 py-10 rounded-xl shadow-md mt-2 ${
@@ -244,12 +244,14 @@ const NewPurchasePage = () => {
             </div>
           </form>
           <div
-            className={showProductAndList ? "grid grid-cols-2 gap-5" : "hidden"}
+            className={
+              showProductAndList ? "lg:grid lg:grid-cols-2 lg:gap-5" : "hidden"
+            }
           >
-            <div className="">
+            <div className="sm:mx-10 lg:mx-0">
               <form
                 ref={formProductRef}
-                className="bg-white px-5 py-10 rounded-xl shadow-md mt-2"
+                className="bg-white p-5 rounded-xl shadow-md mt-2"
                 onSubmit={handleAddProduct}
               >
                 <div className="mb-5">
@@ -266,7 +268,7 @@ const NewPurchasePage = () => {
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-5">
-                  <div className="my-5">
+                  <div className="my-0">
                     <Label text="Quantity" htmlFor="quantity" />
                     <Input
                       id="quantity"
@@ -275,7 +277,7 @@ const NewPurchasePage = () => {
                       onChange={(e) => setQuantity(Number(e.target.value))}
                     />
                   </div>
-                  <div className="my-5">
+                  <div className="my-0">
                     <Label text="Price" htmlFor="price" />
                     <Input
                       id="price"
@@ -284,7 +286,7 @@ const NewPurchasePage = () => {
                       onChange={(e) => setPrice(Number(e.target.value))}
                     />
                   </div>
-                  <div className="my-5">
+                  <div className="my-0">
                     <Label text="Discount" htmlFor="discount" />
                     <Input
                       id="discount"
@@ -294,12 +296,12 @@ const NewPurchasePage = () => {
                     />
                   </div>
                 </div>
-                <div className="my-5">
+                <div className="mt-5">
                   <Button type="submit" label="Add Product" block={true} />
                 </div>
               </form>
             </div>
-            <div>
+            <div className="sm:mx-10 lg:mx-0 xs:mt-5 md:mt-10 lg:mt-0">
               <div className="grid grid-cols-2">
                 <div className="text-sm uppercase text-green-600">
                   Commerce:{" "}
@@ -329,57 +331,64 @@ const NewPurchasePage = () => {
               <h3 className="text-base text-neutral-900 text-center my-5">
                 List of products
               </h3>
-              <table className="table-auto w-full shadow-md">
-                <thead className=" text-green-600">
-                  <tr>
-                    <th className="px-4 py-2 bg-neutral-200 rounded-tl-lg ">
-                      Product
-                    </th>
-                    <th className="px-4 py-2 bg-neutral-200">Quantity</th>
-                    <th className="px-4 py-2 bg-neutral-200">Price</th>
-                    <th className="px-4 py-2 bg-neutral-200">Discount</th>
-                    <th className="px-4 py-2 bg-neutral-200 rounded-tr-lg"></th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white">
-                  {items.map((item, index) => (
-                    <tr key={index} className="border-t-2 hover:bg-neutral-100">
-                      <td className="px-4 py-2 text-justify">
-                        {item.description}
+              <div className="">
+                <table className="table-auto xs:table-fixed w-full shadow-md">
+                  <thead className=" text-green-600">
+                    <tr>
+                      <th className="px-4 py-2 bg-neutral-200 rounded-tl-lg ">
+                        Product
+                      </th>
+                      <th className="px-4 py-2 bg-neutral-200">Quantity</th>
+                      <th className="px-4 py-2 bg-neutral-200">Price</th>
+                      <th className="px-4 py-2 bg-neutral-200">Discount</th>
+                      <th className="px-4 py-2 bg-neutral-200 rounded-tr-lg"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white">
+                    {items.map((item, index) => (
+                      <tr
+                        key={index}
+                        className="border-t-2 hover:bg-neutral-100"
+                      >
+                        <td className="px-4 py-2 text-justify">
+                          {item.description}
+                        </td>
+                        <td className="px-4 py-2 text-center">
+                          {item.quantity}
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          {currency(item.price)}
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          {currency(item.discount)}
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          <Button
+                            type="button"
+                            color="danger"
+                            size="xs"
+                            label={remove}
+                            onClick={() => handleRemoveProduct(item.productId)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot className=" text-green-600 border-t-4">
+                    <tr>
+                      <td className="px-4 py-2" colSpan="2">
+                        Total
                       </td>
-                      <td className="px-4 py-2 text-center">{item.quantity}</td>
                       <td className="px-4 py-2 text-right">
-                        {currency(item.price)}
+                        {currency(subTotal)}
                       </td>
                       <td className="px-4 py-2 text-right">
-                        {currency(item.discount)}
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        <Button
-                          type="button"
-                          color="danger"
-                          size="sm"
-                          label={remove}
-                          onClick={() => handleRemoveProduct(item.productId)}
-                        />
+                        {currency(discountTotal)}
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-                <tfoot className=" text-green-600 border-t-4">
-                  <tr>
-                    <td className="px-4 py-2" colSpan="2">
-                      Total
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      {currency(subTotal)}
-                    </td>
-                    <td className="px-4 py-2 text-right">
-                      {currency(discountTotal)}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+                  </tfoot>
+                </table>
+              </div>
               <div className="mt-5 grid grid-cols-2">
                 <div className="col-start-2 col-end-2">
                   <div className="font-bold text-sm uppercase flex justify-between">
