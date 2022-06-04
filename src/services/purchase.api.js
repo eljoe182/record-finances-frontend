@@ -1,5 +1,12 @@
 import API from "./api";
 
+export const getAll = async () => {
+  return API.get({
+    path: "/purchase",
+    secure: true,
+  });
+};
+
 export const store = async (data) => {
   return API.post({
     path: "/purchase/store",

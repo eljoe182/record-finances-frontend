@@ -7,6 +7,7 @@ export { default as Input } from "./InputComponent";
 export { default as Label } from "./LabelComponent";
 export { default as Loading } from "./LoadingComponent";
 export { default as Button } from "./ButtonComponent";
+export { default as InfoTable } from "./InfoTableComponent";
 
 // sidebar
 export { default as Sidebar } from "./sidebar/SidebarComponent";

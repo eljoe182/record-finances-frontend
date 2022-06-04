@@ -21,6 +21,9 @@ const SidebarComponent = () => {
           <li>
             <ItemMenu title="Create" href="/purchases/new" />
           </li>
+          <li>
+            <ItemMenu title="All purchases" href="/purchases" />
+          </li>
         </SectionMenu>
       </div>
     </nav>
