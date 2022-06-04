@@ -3,21 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
 import AutocompleteComponent from "../../components/AutocompleteComponent";
-import { Button, Input, Label } from "../../components";
+import { Button, Input, Label, Loading } from "../../components";
 
 import { getAll } from "../../services/wallet.api";
 import { findByDescription } from "../../services/commerce.api";
 import { findByDescription as productFindByDescription } from "../../services/products.api";
 import { store } from "../../services/purchase.api";
 import { currency } from "../../helpers/numberFormat";
+import { remove } from "../../helpers/icons";
 
 const NewPurchasePage = () => {
   const navigate = useNavigate();
+  const [loadingSave, setLoadingSave] = useState(false);
   const [wallets, setWallets] = useState([]);
   const [items, setItems] = useState([]);
   const [purchaseInfo, setPurchaseInfo] = useState(null);
   const [productInfo, setProductInfo] = useState(null);
   const [showProductAndList, setShowProductAndList] = useState(false);
+
+  const [commerceInfo, setCommerceInfo] = useState(null);
+  const [walletSelected, setWalletSelected] = useState(null);
+  const [dateInvoice, setDateInvoice] = useState(null);
+  const [description, setDescription] = useState(null);
 
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
@@ -33,29 +40,29 @@ const NewPurchasePage = () => {
   const formProductRef = useRef(null);
 
   /** COMMERCE INFO */
-  const handleChangePurchaseInfo = (e) => {
-    const { name, value, options, selectedIndex, type } = e.target;
-
-    if (type === "select-one") {
-      setPurchaseInfo({
-        ...purchaseInfo,
-        walletId: options[selectedIndex].value,
-        walletDescription: options[selectedIndex].text,
-      });
-      return;
-    }
-    setPurchaseInfo({ ...purchaseInfo, [name]: value });
-  };
 
   const handleCommerceOnSelected = (commerce) => {
-    setPurchaseInfo({
-      ...purchaseInfo,
+    setCommerceInfo({
       commerceId: commerce?._id ?? null,
       commerceDescription: commerce?.description ?? null,
     });
   };
 
-  const handleSaveCommerceInfo = () => {
+  const handleSaveCommerceInfo = (e) => {
+    e.preventDefault();
+    if (
+      ![
+        commerceInfo?.commerceId,
+        commerceInfo?.commerceDescription,
+        walletSelected?.walletId,
+        walletSelected?.walletDescription,
+        dateInvoice,
+      ].every((item) => !!item)
+    ) {
+      toast.error("Commerce, wallet and date are required");
+      return;
+    }
+
     setShowProductAndList(true);
   };
 
@@ -72,16 +79,29 @@ const NewPurchasePage = () => {
     e.preventDefault();
     const newItem = {
       productId: productInfo?.productId,
-      description: productInfo.productDescription,
+      description: productInfo?.productDescription,
       quantity,
       price,
       discount,
       total: quantity * price,
     };
-    console.log({ newItem });
+
+    if (![newItem.productId, newItem.description].every((item) => !!item)) {
+      toast.error("Product is required");
+      return;
+    }
+
+    if (![newItem.quantity, newItem.price].every((item) => item > 0)) {
+      toast.error("Quantity, and price are required");
+      return;
+    }
+
     setItems([...items, newItem]);
     calculateTotal();
     setProductInfo(null);
+    setQuantity(0);
+    setPrice(0);
+    setDiscount(0);
     formProductRef.current.reset();
   };
 
@@ -111,8 +131,13 @@ const NewPurchasePage = () => {
   };
 
   const handleSavePurchase = async () => {
+    setLoadingSave(true);
     const purchase = {
-      ...purchaseInfo,
+      commerceId: commerceInfo?.commerceId,
+      commerceDescription: commerceInfo?.commerceDescription,
+      walletId: walletSelected?._id,
+      dateInvoice,
+      description,
       subTotal,
       discountTotal,
       net,
@@ -120,6 +145,7 @@ const NewPurchasePage = () => {
       total,
       items,
     };
+
     await store(purchase)
       .then((res) => {
         const { _id } = res.data;
@@ -128,6 +154,7 @@ const NewPurchasePage = () => {
       .catch((err) => {
         toast.error(err.response.data.message);
       });
+    setLoadingSave(false);
   };
 
   useEffect(() => {
@@ -150,10 +177,11 @@ const NewPurchasePage = () => {
       </p>
       <div className="container mx-auto">
         <div className="mt-5 flex flex-row justify-center ">
-          <div
+          <form
             className={`bg-white px-5 py-10 rounded-xl shadow-md mt-2 ${
               showProductAndList ? "hidden" : ""
             }`}
+            onSubmit={handleSaveCommerceInfo}
           >
             <AutocompleteComponent
               title="Commerce"
@@ -174,7 +202,13 @@ const NewPurchasePage = () => {
                   id="walletId"
                   name="walletId"
                   className="border w-full p-2 mt-2 bg-gray-50 rounded-xl"
-                  onChange={handleChangePurchaseInfo}
+                  onChange={(e) => {
+                    const { options, selectedIndex } = e.target;
+                    setWalletSelected({
+                      walletId: options[selectedIndex].value,
+                      walletDescription: options[selectedIndex].text,
+                    });
+                  }}
                 >
                   <option value="">-- Select wallet --</option>
                   {wallets.map((wallet) => (
@@ -190,7 +224,7 @@ const NewPurchasePage = () => {
                   id="dateInvoice"
                   name="dateInvoice"
                   type="date"
-                  onChange={handleChangePurchaseInfo}
+                  onChange={(e) => setDateInvoice(e.target.value)}
                 />
               </div>
             </div>
@@ -202,17 +236,13 @@ const NewPurchasePage = () => {
                 type="text"
                 placeholder="Purchase of products on the market"
                 value={purchaseInfo?.description ?? ""}
-                onChange={handleChangePurchaseInfo}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
             <div className="mt-10">
-              <Button
-                type="button"
-                label="Add"
-                onClick={handleSaveCommerceInfo}
-              />
+              <Button type="submit" label="Add" block={true} />
             </div>
-          </div>
+          </form>
           <div
             className={showProductAndList ? "grid grid-cols-2 gap-5" : "hidden"}
           >
@@ -265,7 +295,7 @@ const NewPurchasePage = () => {
                   </div>
                 </div>
                 <div className="my-5">
-                  <Button type="submit" label="Add Product" />
+                  <Button type="submit" label="Add Product" block={true} />
                 </div>
               </form>
             </div>
@@ -274,25 +304,25 @@ const NewPurchasePage = () => {
                 <div className="text-sm uppercase text-green-600">
                   Commerce:{" "}
                   <span className="text-sm text-black normal-case">
-                    {purchaseInfo?.commerceDescription}
+                    {commerceInfo?.commerceDescription}
                   </span>
                 </div>
                 <div className="text-sm uppercase text-green-600">
                   Date Invoice:{" "}
                   <span className="text-sm text-black normal-case">
-                    {purchaseInfo?.dateInvoice}
+                    {dateInvoice}
                   </span>
                 </div>
                 <div className="text-sm uppercase text-green-600">
                   Wallet pay:{" "}
                   <span className="text-sm text-black normal-case">
-                    {purchaseInfo?.walletDescription}
+                    {walletSelected?.walletDescription}
                   </span>
                 </div>
                 <div className="text-sm uppercase text-green-600">
                   Description:{" "}
                   <span className="text-sm text-black normal-case">
-                    {purchaseInfo?.description}
+                    {description}
                   </span>
                 </div>
               </div>
@@ -327,8 +357,9 @@ const NewPurchasePage = () => {
                       <td className="px-4 py-2 text-right">
                         <Button
                           type="button"
-                          size="small"
-                          label="X"
+                          color="danger"
+                          size="sm"
+                          label={remove}
                           onClick={() => handleRemoveProduct(item.productId)}
                         />
                       </td>
@@ -373,11 +404,21 @@ const NewPurchasePage = () => {
                 </div>
               </div>
               <div className="mt-10">
-                <Button
-                  type="button"
-                  label="Save"
-                  onClick={handleSavePurchase}
-                />
+                {loadingSave ? (
+                  <>
+                    <Loading show={true} />
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      label="Save"
+                      block={true}
+                      onClick={handleSavePurchase}
+                      disabled={items.length === 0}
+                    />
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -81,7 +81,7 @@ const AutocompleteComponent = ({ placeholder, title, sources, onSelected }) => {
 
   return (
     <>
-      <div className="mb-1">
+      <div>
         <Label text={title} />
         <input
           ref={inputRef}
@@ -90,11 +90,9 @@ const AutocompleteComponent = ({ placeholder, title, sources, onSelected }) => {
           {...inputProps}
           onBlur={handleBlur}
         />
-      </div>
-      <div>
         {autocompleteState.isOpen && (
           <div
-            className="absolute bg-white rounded-lg shadow-lg p-2 border-2 overflow-hidden"
+            className="absolute bg-white rounded-lg shadow-lg p-2 border-2 overflow-hidden z-10"
             ref={panelRef}
             {...autocomplete.getPanelProps()}
           >

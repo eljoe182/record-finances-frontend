@@ -163,3 +163,16 @@ export const key = (
     <line stroke="currentColor" x1="21" y1="12" x2="21" y2="14" />
   </svg>
 );
+
+export const remove = (
+  <svg
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+  >
+    <circle stroke="currentColor" cx="11.80851" cy="11.87234" r="10" />
+    <line stroke="currentColor" x1="17" y1="12" x2="7" y2="12" />
+  </svg>
+);
