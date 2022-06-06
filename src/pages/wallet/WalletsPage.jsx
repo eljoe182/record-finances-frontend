@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useRef, createRef } from "react";
 import { Button, Input, Label, Loading } from "../../components";
 import { edit, trash } from "../../helpers/icons";
+import { useMenu } from "../../hooks/useMenu";
 import { destroy, getAll, store, update } from "../../services/wallet.api";
 
 const WalletsPage = () => {
+  const { setMenuName } = useMenu();
+  setMenuName("wallets");
   const [idWallet, setIdWallet] = useState("");
   const [description, setDescription] = useState("");
   const [balance, setBalance] = useState(0);
@@ -86,8 +89,8 @@ const WalletsPage = () => {
       <p className="text-green-600 font-thin text-sm opacity-70">
         Register your wallets here.
       </p>
-      <div className="container mx-auto lg:grid lg:grid-cols-2 gap-5">
-        <div className="mt-5 max-w-sm container mx-auto">
+      <div className="mx-auto lg:grid lg:grid-cols-2">
+        <div className="mt-5 max-w-md  container mx-auto">
           <h1 className="text-xl text-neutral-900 text-center mb-5">
             Create/Edit
           </h1>
@@ -133,7 +136,7 @@ const WalletsPage = () => {
             )}
           </form>
         </div>
-        <div className="mt-5">
+        <div className="mt-5 max-w-lg container mx-auto">
           <h1 className="text-xl text-neutral-900 text-center mb-5">
             List of Wallets
           </h1>

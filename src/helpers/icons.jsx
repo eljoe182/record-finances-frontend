@@ -83,6 +83,18 @@ export const chevronRight = (
   </svg>
 );
 
+export const chevronDown = (
+  <svg
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+  >
+    <path stroke="currentColor" d="M7.22,9.8l4.11,4.11a1,1,0,0,0,1.41,0l4-4" />
+  </svg>
+);
+
 export const logOut = (
   <svg
     width="24px"

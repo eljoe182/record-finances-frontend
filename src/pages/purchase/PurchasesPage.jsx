@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { InfoTable } from "../../components";
 import { formatDate } from "../../helpers/dateFormat";
 import { currency } from "../../helpers/numberFormat";
+import { useMenu } from "../../hooks/useMenu";
 import { getAll } from "../../services/purchase.api";
 
 const FILTER_INITIAL = {
@@ -10,6 +11,8 @@ const FILTER_INITIAL = {
 };
 
 const PurchasesPage = () => {
+  const { setMenuName } = useMenu();
+  setMenuName("purchase-all");
   const [purchasesData, setPurchasesData] = useState([]);
   const [filter, setFilter] = useState(FILTER_INITIAL);
   const [infoPage, setInfoPage] = useState(1);

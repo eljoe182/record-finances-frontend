@@ -23,17 +23,15 @@ const MainLayout = () => {
 
   return (
     <>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col  min-h-full">
         <Header />
-        <div className="flex flex-1 static">
+        <div className="flex flex-row flex-1">
           <Sidebar />
-          <div className="flex flex-col flex-1 static">
-            <main className="flex-1 px-4 pt-4 mb-10 static">
-              <Outlet />
-            </main>
-            <Footer />
-          </div>
+          <main className="px-4 pt-4 w-full ">
+            <Outlet />
+          </main>
         </div>
+        <Footer />
       </div>
     </>
   );

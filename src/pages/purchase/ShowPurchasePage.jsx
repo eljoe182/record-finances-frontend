@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "../../components";
 import { currency } from "../../helpers/numberFormat";
+import { useMenu } from "../../hooks/useMenu";
 import { show } from "../../services/purchase.api";
 
 const ShowPurchasePage = () => {
+  const { setMenuName } = useMenu();
+  setMenuName("purchase-all");
   const navigate = useNavigate();
   const params = useParams();
   const [purchaseInfo, setPurchaseInfo] = useState({});

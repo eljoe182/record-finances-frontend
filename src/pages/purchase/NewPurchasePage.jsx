@@ -11,9 +11,12 @@ import { findByDescription as productFindByDescription } from "../../services/pr
 import { store } from "../../services/purchase.api";
 import { currency } from "../../helpers/numberFormat";
 import { remove } from "../../helpers/icons";
+import { useMenu } from "../../hooks/useMenu";
 
 const NewPurchasePage = () => {
   const navigate = useNavigate();
+  const { setMenuName } = useMenu();
+  setMenuName("purchase-new");
   const [loadingSave, setLoadingSave] = useState(false);
   const [wallets, setWallets] = useState([]);
   const [items, setItems] = useState([]);

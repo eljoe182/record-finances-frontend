@@ -1,33 +1,54 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { purchase, chevronRight } from "../../helpers/icons";
+import { chevronDown, chevronRight } from "../../helpers/icons";
+import { useMenu } from "../../hooks/useMenu";
 
 const SectionMenuComponent = ({
   children,
+  name,
   title,
   icon,
   href,
-  isSection = true,
+  isMenu = true,
 }) => {
   const navigate = useNavigate();
+  const {
+    setOpenMenu,
+    sectionName,
+    setSectionName,
+    sectionOpen,
+    setSectionOpen,
+  } = useMenu();
 
   const handleClick = () => {
-    if (!isSection) {
+    setSectionOpen(name);
+    if (!isMenu) {
+      setOpenMenu(false);
       navigate(href);
     }
   };
 
   return (
-    <div className="my-1">
+    <div className="">
       <button
-        className="flex flex-row justify-between w-full gap-4 px-5 py-2 "
+        className={`flex flex-row justify-between w-full gap-4 px-5 py-4 ${
+          !isMenu && sectionName === name ? "bg-neutral-800 font-bold" : ""
+        }`}
         onClick={handleClick}
       >
         <div className="">{icon}</div>
         <div className="w-full text-left pl-1">{title}</div>
-        {isSection && <div className="">{chevronRight}</div>}
+        {isMenu && (
+          <div className="">
+            {sectionOpen === name ? chevronDown : chevronRight}
+          </div>
+        )}
       </button>
-      <ul className="bg-neutral-800">{children}</ul>
+      {sectionOpen === name && (
+        <>
+          <ul className="bg-neutral-700/60">{children}</ul>
+        </>
+      )}
     </div>
   );
 };
