@@ -26,7 +26,7 @@ const ShowPurchasePage = () => {
   };
 
   const handleShowPurchases = () => {
-    navigate("/purchases/list");
+    navigate("/purchases");
   };
 
   return (

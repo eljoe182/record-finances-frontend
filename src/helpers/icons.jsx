@@ -202,3 +202,19 @@ export const menu = (
     <line stroke="currentColor" x1="4" y1="19" x2="20" y2="19" />
   </svg>
 );
+
+export const view = (
+  <svg
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+  >
+    <path
+      stroke="currentColor"
+      d="M22,12.12,19.4,15A10,10,0,0,1,4.6,15L2,12.12H2L4.32,9.34a10,10,0,0,1,15.36,0L22,12.12Z"
+    />
+    <ellipse stroke="currentColor" cx="12.09" cy="11.76" rx="2.6" ry="2.5" />
+  </svg>
+);

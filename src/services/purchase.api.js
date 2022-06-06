@@ -21,3 +21,10 @@ export const show = async (id) => {
     secure: true,
   });
 };
+
+export const destroy = async (id) => {
+  return API.delete({
+    path: `/purchase/destroy/${id}`,
+    secure: true,
+  });
+};

@@ -42,11 +42,11 @@ const InfoTableComponent = ({
 
   return (
     <>
-      <div className="flex flex-row justify-between py-2 px-10 items-center">
+      <div className="flex flex-row justify-between py-2 md:px-10 xs:px-5 items-center">
         <div className="font-bold text-green-600 text-center">
           Rows: <span className="font-normal text-black">{rowsCount}</span>
         </div>
-        <div className="flex gap-5 items-center flex-1 justify-center ">
+        <div className="flex md:gap-5 items-center flex-1 justify-center ">
           <button
             className={`hover:bg-neutral-200 rounded-xl ${
               page === 1
