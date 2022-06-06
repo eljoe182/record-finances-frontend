@@ -64,7 +64,12 @@ const SignUpPage = () => {
             />
           </div>
           <div className="mt-10">
-            <Button type="submit" label="Sign Up" color="primary" />
+            <Button
+              type="submit"
+              label="Sign Up"
+              color="primary"
+              block={true}
+            />
           </div>
           <nav className="mt-5 lg:flex lg:justify-between">
             <Link
