@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useMenu } from "../../hooks/useMenu";
 
 const ItemMenuComponent = ({ href = "/", name, title, section }) => {
-  const { setOpenMenu, menuName, setSectionName } = useMenu();
+  const { setOpenMenu, menuName, setSectionName, setMenuName } = useMenu();
   return (
     <div
       className={`flex items-center hover:bg-neutral-700 hover:rounded-r-3xl hover:font-bold pl-10 hover:text-gray-100 transition-colors ${
@@ -16,6 +16,7 @@ const ItemMenuComponent = ({ href = "/", name, title, section }) => {
         onClick={() => {
           setOpenMenu(false);
           setSectionName(section);
+          setMenuName(name);
         }}
       >
         {title}

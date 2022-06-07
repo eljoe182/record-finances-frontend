@@ -26,6 +26,7 @@ const InputComponent = ({
         onChange={onChange}
         readOnly={readOnly}
         disabled={disabled}
+        step="any"
       />
     </div>
   );

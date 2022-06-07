@@ -11,12 +11,9 @@ import { findByDescription as productFindByDescription } from "../../services/pr
 import { store } from "../../services/purchase.api";
 import { currency } from "../../helpers/numberFormat";
 import { remove } from "../../helpers/icons";
-import { useMenu } from "../../hooks/useMenu";
 
 const NewPurchasePage = () => {
   const navigate = useNavigate();
-  const { setMenuName } = useMenu();
-  setMenuName("purchase-new");
   const [loadingSave, setLoadingSave] = useState(false);
   const [wallets, setWallets] = useState([]);
   const [items, setItems] = useState([]);
@@ -122,9 +119,9 @@ const NewPurchasePage = () => {
       calcDiscount += item.discount;
     });
 
-    const calcNet = calcSubTotal - calcDiscount;
-    const calcTax = Math.ceil(calcNet * 0.19);
-    const calcTotal = calcNet + calcTax;
+    const calcTotal = calcSubTotal - calcDiscount;
+    const calcNet = Math.round(calcTotal / 1.19);
+    const calcTax = calcTotal - calcNet;
 
     setSubTotal(calcSubTotal);
     setDiscountTotal(calcDiscount);
@@ -359,7 +356,7 @@ const NewPurchasePage = () => {
                           {item.quantity}
                         </td>
                         <td className="px-4 py-2 text-right">
-                          {currency(item.price)}
+                          {currency(item.total)}
                         </td>
                         <td className="px-4 py-2 text-right">
                           {currency(item.discount)}
@@ -397,10 +394,12 @@ const NewPurchasePage = () => {
                     <span>Sub Total:</span>
                     <span>{currency(subTotal)}</span>
                   </div>
-                  <div className="font-bold text-sm uppercase flex justify-between">
-                    <span>Discount:</span>
-                    <span>{currency(discountTotal)}</span>
-                  </div>
+                  {discountTotal > 0 && (
+                    <div className="font-bold text-sm uppercase flex justify-between">
+                      <span>Discount:</span>
+                      <span>-{currency(discountTotal)}</span>
+                    </div>
+                  )}
                   <div className="font-bold text-sm uppercase flex justify-between">
                     <span>Net:</span> <span>{currency(net)}</span>
                   </div>

@@ -80,7 +80,7 @@ const ShowPurchasePage = () => {
                 </div>
                 <div className="text-right">{currency(item.total)}</div>
                 <div className="text-right">
-                  {item.discount > 0 && currency(item.discount)}
+                  {item.discount > 0 && `-${currency(item.discount)}`}
                 </div>
               </div>
             ))}
@@ -97,7 +97,7 @@ const ShowPurchasePage = () => {
             <div className="grid grid-cols-5">
               <div className="col-start-3 col-end-3">Discount</div>
               <div className="col-auto text-right">
-                {currency(purchaseInfo.discount)}
+                -{currency(purchaseInfo.discount)}
               </div>
             </div>
           )}

@@ -4,7 +4,6 @@ import { InfoTable } from "../../components";
 import { formatDate } from "../../helpers/dateFormat";
 import { edit, remove, view } from "../../helpers/icons";
 import { currency } from "../../helpers/numberFormat";
-import { useMenu } from "../../hooks/useMenu";
 import { destroy, getAll } from "../../services/purchase.api";
 
 const FILTER_INITIAL = {
@@ -14,8 +13,6 @@ const FILTER_INITIAL = {
 
 const PurchasesPage = () => {
   const navigate = useNavigate();
-  const { setMenuName } = useMenu();
-  setMenuName("purchase-all");
   const [purchasesData, setPurchasesData] = useState([]);
   const [filter, setFilter] = useState(FILTER_INITIAL);
   const [infoPage, setInfoPage] = useState(1);

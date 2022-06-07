@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef, createRef } from "react";
 import { Button, Input, Label, Loading, Modal } from "../../components";
 import { add, edit, trash } from "../../helpers/icons";
 import { currency } from "../../helpers/numberFormat";
-import { useMenu } from "../../hooks/useMenu";
 import {
   addBalance,
   destroy,
@@ -12,8 +11,6 @@ import {
 } from "../../services/wallet.api";
 
 const WalletsPage = () => {
-  const { setMenuName } = useMenu();
-  setMenuName("wallets");
   const [idWallet, setIdWallet] = useState("");
   const [description, setDescription] = useState("");
   const [balance, setBalance] = useState(0);
@@ -234,7 +231,7 @@ const WalletsPage = () => {
               {wallets.map((wallet, index) => (
                 <div
                   key={index}
-                  className="bg-white py-3 px-5 rounded-xl shadow-lg my-2 hover:bg-gray-100 md:mx-20 lg:mx-auto"
+                  className="bg-white py-3 px-5 rounded-xl shadow-md my-2 hover:shadow-inner hover:border-green-700/50 hover:border md:mx-20 lg:mx-auto"
                 >
                   <div
                     className="hidden"
