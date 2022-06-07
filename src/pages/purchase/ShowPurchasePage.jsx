@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "../../components";
 import { currency } from "../../helpers/numberFormat";
+import { useMenu } from "../../hooks/useMenu";
 import { show } from "../../services/purchase.api";
 
 const ShowPurchasePage = () => {
+  const { setMenuName } = useMenu();
+  setMenuName("purchase-all");
   const navigate = useNavigate();
   const params = useParams();
   const [purchaseInfo, setPurchaseInfo] = useState({});
@@ -23,7 +26,7 @@ const ShowPurchasePage = () => {
   };
 
   const handleShowPurchases = () => {
-    navigate("/purchases/list");
+    navigate("/purchases");
   };
 
   return (
@@ -77,7 +80,7 @@ const ShowPurchasePage = () => {
                 </div>
                 <div className="text-right">{currency(item.total)}</div>
                 <div className="text-right">
-                  {item.discount > 0 && currency(item.discount)}
+                  {item.discount > 0 && `-${currency(item.discount)}`}
                 </div>
               </div>
             ))}
@@ -94,7 +97,7 @@ const ShowPurchasePage = () => {
             <div className="grid grid-cols-5">
               <div className="col-start-3 col-end-3">Discount</div>
               <div className="col-auto text-right">
-                {currency(purchaseInfo.discount)}
+                -{currency(purchaseInfo.discount)}
               </div>
             </div>
           )}

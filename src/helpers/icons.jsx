@@ -83,6 +83,18 @@ export const chevronRight = (
   </svg>
 );
 
+export const chevronDown = (
+  <svg
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+  >
+    <path stroke="currentColor" d="M7.22,9.8l4.11,4.11a1,1,0,0,0,1.41,0l4-4" />
+  </svg>
+);
+
 export const logOut = (
   <svg
     width="24px"
@@ -188,5 +200,35 @@ export const menu = (
     <line stroke="currentColor" x1="4" y1="12" x2="20" y2="12" />
     <line stroke="currentColor" x1="4" y1="5" x2="20" y2="5" />
     <line stroke="currentColor" x1="4" y1="19" x2="20" y2="19" />
+  </svg>
+);
+
+export const view = (
+  <svg
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+  >
+    <path
+      stroke="currentColor"
+      d="M22,12.12,19.4,15A10,10,0,0,1,4.6,15L2,12.12H2L4.32,9.34a10,10,0,0,1,15.36,0L22,12.12Z"
+    />
+    <ellipse stroke="currentColor" cx="12.09" cy="11.76" rx="2.6" ry="2.5" />
+  </svg>
+);
+
+export const add = (
+  <svg
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+  >
+    <circle stroke="currentColor" cx="12" cy="12" r="10" />
+    <line stroke="currentColor" x1="17.19" y1="12.13" x2="7.19" y2="12.13" />
+    <line stroke="currentColor" x1="12.19" y1="17.13" x2="12.19" y2="7.13" />
   </svg>
 );

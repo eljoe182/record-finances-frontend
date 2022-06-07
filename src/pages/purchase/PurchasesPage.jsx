@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { InfoTable } from "../../components";
 import { formatDate } from "../../helpers/dateFormat";
+import { edit, remove, view } from "../../helpers/icons";
 import { currency } from "../../helpers/numberFormat";
-import { getAll } from "../../services/purchase.api";
+import { destroy, getAll } from "../../services/purchase.api";
 
 const FILTER_INITIAL = {
   page: 1,
@@ -10,6 +12,7 @@ const FILTER_INITIAL = {
 };
 
 const PurchasesPage = () => {
+  const navigate = useNavigate();
   const [purchasesData, setPurchasesData] = useState([]);
   const [filter, setFilter] = useState(FILTER_INITIAL);
   const [infoPage, setInfoPage] = useState(1);
@@ -29,6 +32,23 @@ const PurchasesPage = () => {
   const onPrevious = () => {};
   const onSize = () => {};
 
+  const handleView = (id) => {
+    navigate(`/purchases/show/${id}`);
+  };
+
+  const handleDelete = async (id) => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this purchase?"
+    );
+    if (confirm) {
+      await destroy(id).then((res) => {
+        const newData = purchasesData.filter((purchase) => purchase._id !== id);
+        setPurchasesData(newData);
+        setInfoRowsCount(newData.length);
+      });
+    }
+  };
+
   return (
     <>
       <h1 className="text-3xl font-black">Your Purchases</h1>
@@ -42,8 +62,8 @@ const PurchasesPage = () => {
               <th className="px-4 py-2 bg-gray-200 rounded-tl-xl">
                 Date Invoice
               </th>
-              <th className="px-4 py-2 bg-gray-200">Commerce</th>
-              <th className="px-4 py-2 bg-gray-200">Wallet</th>
+              <th className="px-4 py-2 bg-gray-200 xs:hidden">Commerce</th>
+              <th className="px-4 py-2 bg-gray-200 xs:hidden">Wallet</th>
               <th className="px-4 py-2 bg-gray-200">Description</th>
               <th className="px-4 py-2 bg-gray-200">Total</th>
               <th className="px-4 py-2 bg-gray-200 rounded-tr-xl">Actions</th>
@@ -60,17 +80,33 @@ const PurchasesPage = () => {
                 <td className="py-2 text-center">
                   {formatDate(purchase.dateInvoice)}
                 </td>
-                <td className="py-2 pl-2">
+                <td className="py-2 pl-2 xs:hidden truncate">
                   {purchase.commerceId?.description}
                 </td>
-                <td className="py-2 text-center">
+                <td className="py-2 text-center xs:hidden truncate">
                   {purchase.walletId?.description}
                 </td>
                 <td className="py-2 text-justify">{purchase.description}</td>
                 <td className="py-2 text-right pr-5">
                   {currency(purchase.total)}
                 </td>
-                <td className="py-2 text-right pr-5"></td>
+                <td className="py-2 text-center gap-2 space-x-2">
+                  <button
+                    className="bg-green-600 text-white p-1 rounded-full"
+                    onClick={() => handleView(purchase._id)}
+                  >
+                    {view}
+                  </button>
+                  <button className="bg-blue-600 text-white p-1 rounded-full">
+                    {edit}
+                  </button>
+                  <button
+                    className="bg-red-600 text-white p-1 rounded-full"
+                    onClick={() => handleDelete(purchase._id)}
+                  >
+                    {remove}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

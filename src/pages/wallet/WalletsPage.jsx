@@ -1,7 +1,14 @@
 import React, { useEffect, useState, useRef, createRef } from "react";
-import { Button, Input, Label, Loading } from "../../components";
-import { edit, trash } from "../../helpers/icons";
-import { destroy, getAll, store, update } from "../../services/wallet.api";
+import { Button, Input, Label, Loading, Modal } from "../../components";
+import { add, edit, trash } from "../../helpers/icons";
+import { currency } from "../../helpers/numberFormat";
+import {
+  addBalance,
+  destroy,
+  getAll,
+  store,
+  update,
+} from "../../services/wallet.api";
 
 const WalletsPage = () => {
   const [idWallet, setIdWallet] = useState("");
@@ -10,6 +17,13 @@ const WalletsPage = () => {
   const [wallets, setWallets] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [loadingSaveData, setLoadingSaveData] = useState(false);
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalAmount, setModalAmount] = useState(0);
+  const [modalBalance, setModalBalance] = useState(0);
+  const [modalWalletId, setModalWalletId] = useState(null);
+
+  const formRef = useRef(null);
   const buttonDeleteRef = useRef([]);
   const rowListWalletRef = useRef([]);
 
@@ -66,6 +80,7 @@ const WalletsPage = () => {
     setDescription("");
     setBalance(0);
     setLoadingSaveData(false);
+    formRef.current.reset();
   };
 
   const handleEdit = (wallet) => {
@@ -80,18 +95,81 @@ const WalletsPage = () => {
     setWallets(wallets.filter((wallet) => wallet._id !== id));
   };
 
+  const onCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const handleUpdateBalance = async ({ _id, balance }) => {
+    setModalWalletId(_id);
+    setModalBalance(balance);
+    setShowModal(true);
+  };
+
+  const handleUpdateBalanceModal = async (e) => {
+    e.preventDefault();
+    setShowModal(false);
+    await addBalance({
+      wallet: modalWalletId,
+      amount: Number(modalAmount),
+    }).then((response) => {
+      const newWallets = wallets.map((wallet) => {
+        if (wallet._id === modalWalletId) {
+          return { ...wallet, balance: response.data.balance };
+        }
+        return wallet;
+      });
+      setWallets(newWallets);
+    });
+  };
+
   return (
     <>
+      <Modal title="Add Balance" show={showModal} onClose={onCloseModal}>
+        <form onSubmit={handleUpdateBalanceModal}>
+          <div className="mb-4">
+            <Label text="Current balance" />
+            <Input
+              id="balance"
+              type="number"
+              name="balance"
+              value={modalBalance}
+              readOnly={true}
+              disabled={true}
+            />
+          </div>
+          <div className="mb-4">
+            <Label text="Amount" htmlFor="amount" />
+            <Input
+              id="amount"
+              type="number"
+              name="amount"
+              value={modalAmount}
+              placeholder="10.000"
+              onChange={(e) => setModalAmount(e.target.value)}
+            />
+          </div>
+          <div className="mb-t flex justify-end xs:justify-center space-x-2">
+            <Button label="Save" type="submit" />
+            <Button
+              type="button"
+              label="Cancel"
+              color="neutral"
+              onClick={() => setShowModal(false)}
+            />
+          </div>
+        </form>
+      </Modal>
       <h1 className="text-3xl font-black">Wallets</h1>
       <p className="text-green-600 font-thin text-sm opacity-70">
         Register your wallets here.
       </p>
-      <div className="container mx-auto lg:grid lg:grid-cols-2 gap-5">
-        <div className="mt-5 max-w-sm container mx-auto">
+      <div className="mx-auto lg:grid lg:grid-cols-2">
+        <div className="mt-5 max-w-md  container mx-auto">
           <h1 className="text-xl text-neutral-900 text-center mb-5">
             Create/Edit
           </h1>
           <form
+            ref={formRef}
             onSubmit={handleSubmit}
             className="bg-white p-5 rounded-xl shadow-lg mt-2"
           >
@@ -133,7 +211,7 @@ const WalletsPage = () => {
             )}
           </form>
         </div>
-        <div className="mt-5">
+        <div className="mt-5 max-w-lg container mx-auto">
           <h1 className="text-xl text-neutral-900 text-center mb-5">
             List of Wallets
           </h1>
@@ -153,7 +231,7 @@ const WalletsPage = () => {
               {wallets.map((wallet, index) => (
                 <div
                   key={index}
-                  className="bg-white py-3 px-5 rounded-xl shadow-lg my-2 hover:bg-gray-100 md:mx-20 lg:mx-auto"
+                  className="bg-white py-3 px-5 rounded-xl shadow-md my-2 hover:shadow-inner hover:border-green-700/50 hover:border md:mx-20 lg:mx-auto"
                 >
                   <div
                     className="hidden"
@@ -179,11 +257,18 @@ const WalletsPage = () => {
                           Balance:
                         </span>
                         <span className="font-normal text-black">
-                          {wallet.balance}
+                          {currency(wallet.balance)}
                         </span>
                       </div>
                     </div>
                     <div className="flex flex-row gap-2">
+                      <Button
+                        type="button"
+                        label={add}
+                        size="sm"
+                        color="secondary"
+                        onClick={() => handleUpdateBalance(wallet)}
+                      />
                       <Button
                         type="button"
                         label={edit}

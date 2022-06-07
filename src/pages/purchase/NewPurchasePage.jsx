@@ -119,9 +119,9 @@ const NewPurchasePage = () => {
       calcDiscount += item.discount;
     });
 
-    const calcNet = calcSubTotal - calcDiscount;
-    const calcTax = Math.ceil(calcNet * 0.19);
-    const calcTotal = calcNet + calcTax;
+    const calcTotal = calcSubTotal - calcDiscount;
+    const calcNet = Math.round(calcTotal / 1.19);
+    const calcTax = calcTotal - calcNet;
 
     setSubTotal(calcSubTotal);
     setDiscountTotal(calcDiscount);
@@ -135,7 +135,7 @@ const NewPurchasePage = () => {
     const purchase = {
       commerceId: commerceInfo?.commerceId,
       commerceDescription: commerceInfo?.commerceDescription,
-      walletId: walletSelected?._id,
+      walletId: walletSelected?.walletId,
       dateInvoice,
       description,
       subTotal,
@@ -213,7 +213,7 @@ const NewPurchasePage = () => {
                   <option value="">-- Select wallet --</option>
                   {wallets.map((wallet) => (
                     <option key={wallet._id} value={wallet._id}>
-                      {wallet.description}
+                      {wallet.description} ({wallet.balance})
                     </option>
                   ))}
                 </select>
@@ -235,7 +235,6 @@ const NewPurchasePage = () => {
                 name="description"
                 type="text"
                 placeholder="Purchase of products on the market"
-                value={purchaseInfo?.description ?? ""}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
@@ -357,7 +356,7 @@ const NewPurchasePage = () => {
                           {item.quantity}
                         </td>
                         <td className="px-4 py-2 text-right">
-                          {currency(item.price)}
+                          {currency(item.total)}
                         </td>
                         <td className="px-4 py-2 text-right">
                           {currency(item.discount)}
@@ -395,10 +394,12 @@ const NewPurchasePage = () => {
                     <span>Sub Total:</span>
                     <span>{currency(subTotal)}</span>
                   </div>
-                  <div className="font-bold text-sm uppercase flex justify-between">
-                    <span>Discount:</span>
-                    <span>{currency(discountTotal)}</span>
-                  </div>
+                  {discountTotal > 0 && (
+                    <div className="font-bold text-sm uppercase flex justify-between">
+                      <span>Discount:</span>
+                      <span>-{currency(discountTotal)}</span>
+                    </div>
+                  )}
                   <div className="font-bold text-sm uppercase flex justify-between">
                     <span>Net:</span> <span>{currency(net)}</span>
                   </div>
