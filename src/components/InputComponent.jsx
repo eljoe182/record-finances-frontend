@@ -6,8 +6,10 @@ const InputComponent = ({
   type = "text",
   placeholder,
   onChange,
-  props,
   icon,
+  readOnly,
+  disabled,
+  value,
 }) => {
   return (
     <div className="relative">
@@ -16,12 +18,14 @@ const InputComponent = ({
         id={id}
         type={type}
         name={name}
+        value={value}
         className={`${
           icon ? "pl-10" : ""
         } border w-full p-2 mt-2 bg-gray-50 rounded-xl`}
         placeholder={placeholder}
         onChange={onChange}
-        {...props}
+        readOnly={readOnly}
+        disabled={disabled}
       />
     </div>
   );

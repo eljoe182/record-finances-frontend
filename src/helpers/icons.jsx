@@ -218,3 +218,17 @@ export const view = (
     <ellipse stroke="currentColor" cx="12.09" cy="11.76" rx="2.6" ry="2.5" />
   </svg>
 );
+
+export const add = (
+  <svg
+    width="24px"
+    height="24px"
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+  >
+    <circle stroke="currentColor" cx="12" cy="12" r="10" />
+    <line stroke="currentColor" x1="17.19" y1="12.13" x2="7.19" y2="12.13" />
+    <line stroke="currentColor" x1="12.19" y1="17.13" x2="12.19" y2="7.13" />
+  </svg>
+);

@@ -41,3 +41,14 @@ export const destroy = async (id) => {
   });
   return response;
 };
+
+export const addBalance = async (data) => {
+  const response = await API.post({
+    path: `/wallet/add-balance`,
+    secure: true,
+    body: data,
+  }).then((response) => {
+    return response;
+  });
+  return response;
+};

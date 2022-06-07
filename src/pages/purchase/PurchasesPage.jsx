@@ -43,7 +43,6 @@ const PurchasesPage = () => {
     const confirm = window.confirm(
       "Are you sure you want to delete this purchase?"
     );
-    console.log(confirm);
     if (confirm) {
       await destroy(id).then((res) => {
         const newData = purchasesData.filter((purchase) => purchase._id !== id);

@@ -138,7 +138,7 @@ const NewPurchasePage = () => {
     const purchase = {
       commerceId: commerceInfo?.commerceId,
       commerceDescription: commerceInfo?.commerceDescription,
-      walletId: walletSelected?._id,
+      walletId: walletSelected?.walletId,
       dateInvoice,
       description,
       subTotal,
@@ -216,7 +216,7 @@ const NewPurchasePage = () => {
                   <option value="">-- Select wallet --</option>
                   {wallets.map((wallet) => (
                     <option key={wallet._id} value={wallet._id}>
-                      {wallet.description}
+                      {wallet.description} ({wallet.balance})
                     </option>
                   ))}
                 </select>
@@ -238,7 +238,6 @@ const NewPurchasePage = () => {
                 name="description"
                 type="text"
                 placeholder="Purchase of products on the market"
-                value={purchaseInfo?.description ?? ""}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
