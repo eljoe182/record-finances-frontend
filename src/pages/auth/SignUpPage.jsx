@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Input, Label } from "../../components";
+import { Button, Input, Label, Loading } from "../../components";
+import { signUp } from "../../services/auth.api";
+import { toast } from "react-hot-toast";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -8,16 +10,47 @@ const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log({
+    if (username.length < 3) {
+      toast.error("Username must be at least 3 characters");
+      return;
+    }
+
+    if (
+      RegExp(
+        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      ).test(email) === false
+    ) {
+      toast.error("Email must be valid");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    await signUp({
       username,
       email,
       password,
-      passwordConfirm,
-    });
-    navigate("/auth/login");
+    })
+      .then(() => {
+        navigate("/auth/login");
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+    setLoading(false);
   };
 
   return (
@@ -25,7 +58,7 @@ const SignUpPage = () => {
       <h1 className="text-3xl font-black text-center ">
         Record<span className="text-green-600">Finance</span>
       </h1>
-      <div className="bg-white border-1 shadow-md px-5 py-10 rounded-lg mt-20">
+      <div className="bg-white border-1 shadow-md p-5 rounded-lg mt-10">
         <form onSubmit={handleSubmit}>
           <div className="my-5">
             <Label text="Username" htmlFor="username" />
@@ -63,15 +96,23 @@ const SignUpPage = () => {
               onChange={(event) => setPasswordConfirm(event.target.value)}
             />
           </div>
-          <div className="mt-10">
-            <Button
-              type="submit"
-              label="Sign Up"
-              color="primary"
-              block={true}
-            />
+          <div className="mt-5">
+            {loading ? (
+              <>
+                <Loading show={loading} />
+              </>
+            ) : (
+              <>
+                <Button
+                  type="submit"
+                  label="Sign Up"
+                  color="primary"
+                  block={true}
+                />
+              </>
+            )}
           </div>
-          <nav className="mt-5 lg:flex lg:justify-between">
+          <nav className="mt-5 lg:flex lg:justify-between px-5">
             <Link
               to="/auth/login"
               className="block text-center my-5 text-gray-500 hover:text-gray-600 transition-colors"
