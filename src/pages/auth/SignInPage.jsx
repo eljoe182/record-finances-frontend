@@ -19,8 +19,10 @@ const SignInPage = () => {
       .then(() => {
         navigate("/");
       })
-      .catch((error) => {
-        toast.error(error.message);
+      .catch(async (error) => {
+        const { message } = await error;
+        console.log(message);
+        toast.error(message);
       });
   };
 
@@ -29,7 +31,7 @@ const SignInPage = () => {
       <h1 className="text-3xl font-black text-center ">
         Record<span className="text-green-600">Finance</span>
       </h1>
-      <div className="bg-white border-1 shadow-md px-5 py-10 rounded-lg mt-20 xs:mt-5">
+      <div className="bg-white border-1 shadow-md p-5 rounded-lg mt-10 xs:mt-5">
         <form onSubmit={handleSubmit}>
           <div className="my-5">
             <Label text="Email" htmlFor="email" />
@@ -51,7 +53,7 @@ const SignInPage = () => {
               onChange={(event) => setPassword(event.target.value)}
             />
           </div>
-          <div className="mt-10">
+          <div className="mt-5">
             <Button
               type="submit"
               label="Sign in"
@@ -59,7 +61,7 @@ const SignInPage = () => {
               block={true}
             />
           </div>
-          <nav className="mt-5 lg:flex lg:justify-between">
+          <nav className="mt-5 lg:flex lg:justify-between px-5">
             <Link
               to="/auth/signup"
               className="block text-center my-5 text-gray-500 hover:text-gray-600 transition-colors"

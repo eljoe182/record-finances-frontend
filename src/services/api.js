@@ -58,13 +58,20 @@ class API {
       body: JSON.stringify(body),
     })
       .then((response) => {
-        return response.json();
+        if (response.ok) {
+          return response.json();
+        }
+        throw response;
       })
       .then((response) => {
         return response;
       })
-      .catch((error) => {
-        throw error;
+      .catch(async (error) => {
+        if (error.status === 500) {
+          throw error;
+        }
+        const { message } = await error.json();
+        throw new Error(message);
       });
   }
 

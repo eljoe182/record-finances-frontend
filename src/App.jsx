@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { MainProvider } from "./context/MainProviderContext";
 import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import RecoveryPasswordPage from "./pages/auth/RecoveryPasswordPage";
 import SignInPage from "./pages/auth/SignInPage";
 import SignUpPage from "./pages/auth/SignUpPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -20,6 +22,8 @@ function App() {
           <Route path="/auth" element={<AuthLayout />}>
             <Route index path="login" element={<SignInPage />} />
             <Route path="signup" element={<SignUpPage />} />
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="recovery/:id" element={<RecoveryPasswordPage />} />
           </Route>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<DashboardPage />} />
