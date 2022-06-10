@@ -5,6 +5,7 @@ import { createAutocomplete } from "@algolia/autocomplete-core";
 
 import AutocompleteComponent from "../../components/AutocompleteComponent";
 import { Button, Input, Label, Loading } from "../../components";
+import Database, { retrieveData } from "../../helpers/indexedDB";
 
 import { getAll } from "../../services/wallet.api";
 import { findByDescription } from "../../services/commerce.api";
@@ -24,12 +25,13 @@ const AutocompleteItem = ({ _id, description, onClick }) => (
   </>
 );
 
+const database = new Database();
+
 const NewPurchasePage = () => {
   const navigate = useNavigate();
   const [loadingSave, setLoadingSave] = useState(false);
   const [wallets, setWallets] = useState([]);
   const [items, setItems] = useState([]);
-  const [purchaseInfo, setPurchaseInfo] = useState(null);
   const [productInfo, setProductInfo] = useState(null);
   const [showProductAndList, setShowProductAndList] = useState(false);
 
@@ -75,6 +77,20 @@ const NewPurchasePage = () => {
       return;
     }
 
+    database.storeData({
+      id: 1,
+      commerceInfo: commerceInfo,
+      walletSelected: walletSelected,
+      dateInvoice: dateInvoice,
+      description: description,
+      items: [],
+      subTotal,
+      discountTotal,
+      net,
+      tax,
+      total,
+    });
+
     setShowProductAndList(true);
   };
 
@@ -110,6 +126,10 @@ const NewPurchasePage = () => {
 
     setItems([...items, newItem]);
     calculateTotal();
+    database.updateData(1, {
+      id: 1,
+      items: [...items, newItem],
+    });
     setProductInfo(null);
     setQuantity(1);
     setPrice(0);
@@ -141,6 +161,15 @@ const NewPurchasePage = () => {
     setNet(calcNet);
     setTax(calcTax);
     setTotal(calcTotal);
+
+    database.updateData(1, {
+      id: 1,
+      subTotal: calcSubTotal,
+      discountTotal: calcDiscount,
+      net: calcNet,
+      tax: calcTax,
+      total: calcTotal,
+    });
   };
 
   const handleSavePurchase = async () => {
